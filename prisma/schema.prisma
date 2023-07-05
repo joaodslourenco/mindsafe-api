@@ -14,12 +14,11 @@ model Patient {
   id        String      @id @default(uuid())
   email     String      @unique
   name      String
-  role      String
   createdAt DateTime    @default(now())
   posts     Post[]
   Therapist Therapist[]
 
-  @@map("user")
+  @@map("patient")
 }
 
 model Therapist {
@@ -28,6 +27,8 @@ model Therapist {
   name      String
   patients  Patient @relation(fields: [patientId], references: [id])
   patientId String
+
+  @@map("therapist")
 }
 
 model Post {
@@ -36,4 +37,6 @@ model Post {
   createdAt DateTime @default(now())
   user      Patient? @relation(fields: [userId], references: [id])
   userId    String?
+
+  @@map("post")
 }
