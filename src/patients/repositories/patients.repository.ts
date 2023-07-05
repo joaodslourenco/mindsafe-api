@@ -16,7 +16,10 @@ export class PatientsRepository {
   }
 
   findOne(id: string) {
-    return this.prisma.patient.findUnique({ where: { id } });
+    return this.prisma.patient.findUnique({
+      where: { id },
+      include: { posts: true, therapist: true },
+    });
   }
 
   update(id: string, updatePatientDto: UpdatePatientDto) {
