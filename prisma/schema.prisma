@@ -11,12 +11,12 @@ datasource db {
 }
 
 model Patient {
-  id        String      @id @default(uuid())
-  email     String      @unique
-  name      String
-  createdAt DateTime    @default(now())
-  posts     Post[]
-  therapist Therapist[]
+  id         String      @id @default(uuid())
+  email      String      @unique
+  name       String
+  createdAt  DateTime    @default(now())
+  posts      Post[]
+  therapists Therapist[]
 
   @@map("patient")
 }
@@ -25,7 +25,7 @@ model Therapist {
   id        String  @id @default(uuid())
   email     String  @unique
   name      String
-  patients  Patient @relation(fields: [patientId], references: [id])
+  patient   Patient @relation(fields: [patientId], references: [id])
   patientId String
 
   @@map("therapist")
