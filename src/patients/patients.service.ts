@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { PatientsRepository } from './repositories/patients.repository';
+import { NotFoundError } from 'src/common/errors/types/NotFoundError';
 
 @Injectable()
 export class PatientsService {
@@ -10,12 +11,22 @@ export class PatientsService {
     return this.patientsRepository.create(createPatientDto);
   }
 
-  findAll() {
-    return this.patientsRepository.findAll();
+  async findAll() {
+    const patients = await this.patientsRepository.findAll();
+
+    if (!patients) {
+      throw new NotFoundError('There are no patients found.');
+    }
+    return patients;
   }
 
-  findOne(id: string) {
-    return this.patientsRepository.findOne(id);
+  async findOne(id: string) {
+    const patient = await this.patientsRepository.findOne(id);
+
+    if (!patient) {
+      throw new NotFoundError('Patient not found');
+    }
+    return patient;
   }
 
   update(id: string, updatePatientDto: UpdatePatientDto) {
