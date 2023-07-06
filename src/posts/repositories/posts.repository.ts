@@ -2,15 +2,23 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { UpdatePostDto } from '../dto/update-post.dto';
+import { NotFoundError } from 'src/common/errors/types/NotFoundError';
 
 @Injectable()
 export class PostsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(createPostDto: CreatePostDto) {
+  async create(createPostDto: CreatePostDto) {
+    const user = await this.prisma.patient.findUnique({
+      where: { id: createPostDto.patientId },
+    });
+
+    if (!user) {
+      throw new NotFoundError('Patient not found!');
+    }
     return this.prisma.post.create({
       data: createPostDto,
-      include: { user: { select: { name: true } } },
+      include: { patient: { select: { name: true } } },
     });
   }
 
