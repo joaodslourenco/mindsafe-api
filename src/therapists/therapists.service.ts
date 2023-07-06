@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateTherapistDto } from './dto/create-therapist.dto';
 import { UpdateTherapistDto } from './dto/update-therapist.dto';
 import { TherapistsRepository } from './repositories/therapists.repository';
+import { NotFoundError } from 'src/common/errors/types/NotFoundError';
 
 @Injectable()
 export class TherapistsService {
@@ -10,12 +11,22 @@ export class TherapistsService {
     return this.therapistsRepository.create(createTherapistDto);
   }
 
-  findAll() {
-    return this.therapistsRepository.findAll();
+  async findAll() {
+    const therapists = await this.therapistsRepository.findAll();
+
+    if (!therapists) {
+      throw new NotFoundError('Therapists not found.');
+    }
+    return therapists;
   }
 
-  findOne(id: string) {
-    return this.therapistsRepository.findOne(id);
+  async findOne(id: string) {
+    const therapist = await this.therapistsRepository.findOne(id);
+
+    if (!therapist) {
+      throw new NotFoundError('Therapist not found.');
+    }
+    return therapist;
   }
 
   update(id: string, updateTherapistDto: UpdateTherapistDto) {
