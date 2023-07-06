@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostsRepository } from './repositories/posts.repository';
+import { NotFoundError } from 'src/common/errors/types/NotFoundError';
 
 @Injectable()
 export class PostsService {
@@ -11,12 +12,22 @@ export class PostsService {
     return this.postsRepository.create(createPostDto);
   }
 
-  findAll() {
-    return this.postsRepository.findAll();
+  async findAll() {
+    const posts = this.postsRepository.findAll();
+
+    if (!posts) {
+      throw new NotFoundError('There are no posts published.');
+    }
+    return posts;
   }
 
-  findOne(id: string) {
-    return this.postsRepository.findOne(id);
+  async findOne(id: string) {
+    const post = await this.postsRepository.findOne(id);
+
+    if (!post) {
+      throw new NotFoundError('The post specified was not found.');
+    }
+    return post;
   }
 
   update(id: string, updatePostDto: UpdatePostDto) {
