@@ -11,6 +11,15 @@ export class PatientsService {
     return this.patientsRepository.create(createPatientDto);
   }
 
+  async findOne(id: string) {
+    const patient = await this.patientsRepository.findOne(id);
+
+    if (!patient) {
+      throw new NotFoundError('Patient not found');
+    }
+    return patient;
+  }
+
   async findAll() {
     const patients = await this.patientsRepository.findAll();
 
@@ -20,13 +29,8 @@ export class PatientsService {
     return patients;
   }
 
-  async findOne(id: string) {
-    const patient = await this.patientsRepository.findOne(id);
-
-    if (!patient) {
-      throw new NotFoundError('Patient not found');
-    }
-    return patient;
+  async findAllPostsByPatient(id: string) {
+    return this.patientsRepository.findAllPostsByPatient(id);
   }
 
   update(id: string, updatePatientDto: UpdatePatientDto) {

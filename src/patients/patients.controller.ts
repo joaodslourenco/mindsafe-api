@@ -20,14 +20,19 @@ export class PatientsController {
     return this.patientsService.create(createPatientDto);
   }
 
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.patientsService.findOne(id);
+  }
+
   @Get()
   findAll() {
     return this.patientsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.patientsService.findOne(id);
+  @Get(':id/posts')
+  findAllPostsByPatient(@Param('id') id: string) {
+    return this.patientsService.findAllPostsByPatient(id);
   }
 
   @Patch(':id')
