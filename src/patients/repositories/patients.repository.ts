@@ -3,12 +3,21 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePatientDto } from '../dto/create-patient.dto';
 import { UpdatePatientDto } from '../dto/update-patient.dto';
 import { NotFoundError } from 'src/common/errors/types/NotFoundError';
+import { ConflictError } from 'src/common/errors/types/ConflictError';
 
 @Injectable()
 export class PatientsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(createPatientDto: CreatePatientDto) {
+  async create(createPatientDto: CreatePatientDto) {
+    const patient = await this.prisma.patient.findUnique({
+      where: { email: createPatientDto.email },
+    });
+
+    if (patient) {
+      throw new ConflictError('Patient already exists.');
+    }
+
     return this.prisma.patient.create({ data: createPatientDto });
   }
 
