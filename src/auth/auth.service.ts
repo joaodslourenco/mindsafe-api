@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { compare } from 'bcrypt';
 import { PatientsService } from 'src/patients/patients.service';
@@ -24,7 +24,7 @@ export class AuthService {
 
     const userCredentialsCorrect = await compare(pass, user.password);
     if (!userCredentialsCorrect) {
-      throw new UnauthorizedError();
+      throw new UnauthorizedError('The credentials informed are incorrect.');
     }
 
     const payload = { sub: user.id, userEmail: user.email };
@@ -60,7 +60,7 @@ export class AuthService {
     const refreshToken = body.refresh_token;
 
     if (!refreshToken) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError('Refresh token not found');
     }
 
     const email = this.jwtService.decode(refreshToken)['userEmail'];
@@ -77,12 +77,12 @@ export class AuthService {
       return user;
     } catch (err) {
       if (err.name === 'JsonWebTokenError') {
-        throw new UnauthorizedException('Invalid signature.');
+        throw new UnauthorizedError('Invalid signature.');
       }
       if (err.name === 'TokenExpiredError') {
-        throw new UnauthorizedException('Expired token.');
+        throw new UnauthorizedError('Expired token.');
       }
-      throw new UnauthorizedException(err.name);
+      throw new UnauthorizedError(err.name);
     }
   }
 }
