@@ -8,11 +8,22 @@ import { NotFoundError } from 'src/common/errors/types/NotFoundError';
 export class PatientsService {
   constructor(private readonly patientsRepository: PatientsRepository) {}
   create(createPatientDto: CreatePatientDto) {
+    const password = createPatientDto.password;
+
     return this.patientsRepository.create(createPatientDto);
   }
 
   async findOne(id: string) {
     const patient = await this.patientsRepository.findOne(id);
+
+    if (!patient) {
+      throw new NotFoundError('Patient not found');
+    }
+    return patient;
+  }
+
+  async findOneByEmail(email: string) {
+    const patient = await this.patientsRepository.findOneByEmail(email);
 
     if (!patient) {
       throw new NotFoundError('Patient not found');

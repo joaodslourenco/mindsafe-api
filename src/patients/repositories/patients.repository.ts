@@ -27,6 +27,14 @@ export class PatientsRepository {
       include: { posts: true, therapists: true },
     });
   }
+  async findOneByEmail(email: string) {
+    const patient = await this.prisma.patient.findUnique({ where: { email } });
+
+    if (!patient) {
+      throw new NotFoundError('Patient not found');
+    }
+    return patient;
+  }
 
   findAll() {
     return this.prisma.patient.findMany();
@@ -55,6 +63,32 @@ export class PatientsRepository {
   }
 
   remove(id: string) {
-    return this.prisma.patient.delete({ where: { id } });
+    const patient = this.prisma.patient.findUnique({ where: { id } });
+
+    if (!patient) {
+      throw new NotFoundError('Patient not found!');
+    }
+
+    const deletePosts = this.prisma.post.deleteMany({
+      where: {
+        patientId: id,
+      },
+    });
+
+    const deleteTherapists = this.prisma.therapist.deleteMany({
+      where: { patientId: id },
+    });
+
+    const deletePatient = this.prisma.patient.delete({
+      where: {
+        id,
+      },
+    });
+
+    return this.prisma.$transaction([
+      deletePosts,
+      deleteTherapists,
+      deletePatient,
+    ]);
   }
 }
