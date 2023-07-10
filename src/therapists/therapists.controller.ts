@@ -10,7 +10,9 @@ import {
 import { TherapistsService } from './therapists.service';
 import { CreateTherapistDto } from './dto/create-therapist.dto';
 import { UpdateTherapistDto } from './dto/update-therapist.dto';
+import { ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Therapists')
 @Controller('therapists')
 export class TherapistsController {
   constructor(private readonly therapistsService: TherapistsService) {}

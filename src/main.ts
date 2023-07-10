@@ -5,9 +5,19 @@ import { UnauthorizedInterceptor } from './common/errors/interceptors/unauthoriz
 import { NotFoundInterceptor } from './common/errors/interceptors/notfound.interceptor';
 import { DatabaseInterceptor } from './common/errors/interceptors/database.interceptor';
 import { ConflictInterceptor } from './common/errors/interceptors/conflict.interceptor';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const config = new DocumentBuilder()
+    .setTitle('Mindsafe API')
+    .setDescription('Welcome to the Mindsafe API documentation!')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+
+  SwaggerModule.setup('docs', app, document);
 
   app.useGlobalPipes(
     new ValidationPipe({
