@@ -14,6 +14,7 @@ model Patient {
   id         String      @id @default(uuid())
   email      String      @unique
   name       String
+  password   String?
   createdAt  DateTime    @default(now())
   posts      Post[]
   therapists Therapist[]
@@ -22,11 +23,11 @@ model Patient {
 }
 
 model Therapist {
-  id        String  @id @default(uuid())
-  email     String  @unique
+  id        String   @id @default(uuid())
+  email     String   @unique
   name      String
-  patient   Patient @relation(fields: [patientId], references: [id])
-  patientId String
+  patient   Patient? @relation(fields: [patientId], references: [id])
+  patientId String?
 
   @@map("therapist")
 }

@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsString, MaxLength } from 'class-validator';
 
 export class CreatePatientDto {
   @IsEmail()
@@ -8,4 +8,9 @@ export class CreatePatientDto {
   @IsNotEmpty()
   @IsString()
   name: string;
+
+  @IsNotEmpty()
+  @MaxLength(10)
+  @IsString()
+  password: string;
 }
