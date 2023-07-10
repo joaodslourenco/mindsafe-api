@@ -12,6 +12,7 @@ import { AuthService } from './auth.service';
 import { SignInDto } from './dto/sign-in.dto';
 import { AuthGuard } from './auth.guard';
 import { Public } from 'src/common/decorators/public';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -22,6 +23,12 @@ export class AuthController {
   @Post('login')
   signIn(@Body() signInDto: SignInDto) {
     return this.authService.signIn(signInDto.email, signInDto.password);
+  }
+
+  @Public()
+  @Post('refresh')
+  reauthenticate(@Body() tokens: RefreshTokenDto) {
+    return this.authService.reauthenticate(tokens);
   }
 
   @UseGuards(AuthGuard)
