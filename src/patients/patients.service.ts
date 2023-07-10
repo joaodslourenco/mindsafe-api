@@ -3,7 +3,7 @@ import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { PatientsRepository } from './repositories/patients.repository';
 import { NotFoundError } from 'src/common/errors/types/NotFoundError';
-import { genSaltSync, hash, hashSync } from 'bcrypt';
+import { genSaltSync, hashSync } from 'bcrypt';
 
 @Injectable()
 export class PatientsService {
