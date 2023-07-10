@@ -3,12 +3,20 @@ import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
 import { PatientsRepository } from './repositories/patients.repository';
 import { NotFoundError } from 'src/common/errors/types/NotFoundError';
+import { genSaltSync, hash, hashSync } from 'bcrypt';
 
 @Injectable()
 export class PatientsService {
   constructor(private readonly patientsRepository: PatientsRepository) {}
+
   create(createPatientDto: CreatePatientDto) {
-    const password = createPatientDto.password;
+    const plainTextPassword = createPatientDto.password;
+
+    const salt = genSaltSync(10);
+
+    const hashedPassword = hashSync(plainTextPassword, salt);
+
+    createPatientDto.password = hashedPassword;
 
     return this.patientsRepository.create(createPatientDto);
   }
