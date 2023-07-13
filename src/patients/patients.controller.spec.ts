@@ -13,6 +13,15 @@ const testPatient: PatientEntity = {
 
 const arrayOfPatients = [testPatient, testPatient, testPatient];
 
+const patientPost = {
+  id: 'some-id',
+  content: 'hello world',
+  createdAt: new Date(),
+  patientId: 'some-id',
+};
+
+const arrayOfPatientPosts = [patientPost, patientPost, patientPost];
+
 describe('PatientsController', () => {
   let patientsController: PatientsController;
   let patientsService: PatientsService;
@@ -27,7 +36,9 @@ describe('PatientsController', () => {
             create: jest.fn().mockResolvedValue(testPatient),
             findOne: jest.fn().mockResolvedValue(testPatient),
             findAll: jest.fn().mockResolvedValue(arrayOfPatients),
-            findAllPostsByPatient: jest.fn(),
+            findAllPostsByPatient: jest
+              .fn()
+              .mockResolvedValue(arrayOfPatientPosts),
             update: jest.fn(),
             remove: jest.fn(),
           },
@@ -84,6 +95,21 @@ describe('PatientsController', () => {
   });
 
   describe('findAll method (GET)', () => {
+    it('should get all patients', async () => {
+      const patients = await patientsController.findAll();
+
+      expect(patients).toBe(arrayOfPatients);
+      expect(patientsService.findAll).toHaveBeenCalled();
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest.spyOn(patientsService, 'findAll').mockRejectedValueOnce(new Error());
+
+      expect(patientsController.findAll()).rejects.toThrowError();
+    });
+  });
+
+  describe('findAllPostsByPatient method (GET)', () => {
     it('should get all patients', async () => {
       const patients = await patientsController.findAll();
 
