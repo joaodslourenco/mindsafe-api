@@ -11,6 +11,8 @@ const testPatient: PatientEntity = {
   createdAt: new Date(),
 };
 
+const arrayOfPatients = [testPatient, testPatient, testPatient];
+
 describe('PatientsController', () => {
   let patientsController: PatientsController;
   let patientsService: PatientsService;
@@ -24,7 +26,7 @@ describe('PatientsController', () => {
           useValue: {
             create: jest.fn().mockResolvedValue(testPatient),
             findOne: jest.fn().mockResolvedValue(testPatient),
-            findAll: jest.fn(),
+            findAll: jest.fn().mockResolvedValue(arrayOfPatients),
             findAllPostsByPatient: jest.fn(),
             update: jest.fn(),
             remove: jest.fn(),
@@ -63,6 +65,36 @@ describe('PatientsController', () => {
       jest.spyOn(patientsService, 'create').mockRejectedValueOnce(new Error());
 
       expect(patientsController.create(testPatient)).rejects.toThrowError();
+    });
+  });
+
+  describe('findOne method (GET)', () => {
+    it('should get an patient', async () => {
+      const patient = await patientsController.findOne(testPatient.id);
+
+      expect(patient).toBe(testPatient);
+      expect(patientsService.findOne).toHaveBeenCalledWith(testPatient.id);
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest.spyOn(patientsService, 'findOne').mockRejectedValueOnce(new Error());
+
+      expect(patientsController.findOne(testPatient.id)).rejects.toThrowError();
+    });
+  });
+
+  describe('findAll method (GET)', () => {
+    it('should get all patients', async () => {
+      const patients = await patientsController.findAll();
+
+      expect(patients).toBe(arrayOfPatients);
+      expect(patientsService.findAll).toHaveBeenCalled();
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest.spyOn(patientsService, 'findAll').mockRejectedValueOnce(new Error());
+
+      expect(patientsController.findAll()).rejects.toThrowError();
     });
   });
 });
