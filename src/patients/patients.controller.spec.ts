@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PatientsController } from './patients.controller';
 import { PatientsService } from './patients.service';
 import { PatientEntity } from './entities/patient.entity';
+import { UpdatePatientDto } from './dto/update-patient.dto';
 
 const testPatient: PatientEntity = {
   id: '13216546',
@@ -10,7 +11,6 @@ const testPatient: PatientEntity = {
   password: '123456',
   createdAt: new Date(),
 };
-
 const arrayOfPatients = [testPatient, testPatient, testPatient];
 
 const patientPost = {
@@ -19,7 +19,6 @@ const patientPost = {
   createdAt: new Date(),
   patientId: 'some-id',
 };
-
 const arrayOfPatientPosts = [patientPost, patientPost, patientPost];
 
 describe('PatientsController', () => {
@@ -39,8 +38,15 @@ describe('PatientsController', () => {
             findAllPostsByPatient: jest
               .fn()
               .mockResolvedValue(arrayOfPatientPosts),
-            update: jest.fn(),
-            remove: jest.fn(),
+            update: jest
+              .fn()
+              .mockImplementation(
+                (id: string, updateDto: UpdatePatientDto) => ({
+                  id,
+                  ...updateDto,
+                }),
+              ),
+            remove: jest.fn().mockResolvedValue(testPatient),
           },
         },
       ],
@@ -111,16 +117,58 @@ describe('PatientsController', () => {
 
   describe('findAllPostsByPatient method (GET)', () => {
     it('should get all patients', async () => {
-      const patients = await patientsController.findAll();
+      const patientPosts = await patientsController.findAllPostsByPatient(
+        testPatient.id,
+      );
 
-      expect(patients).toBe(arrayOfPatients);
-      expect(patientsService.findAll).toHaveBeenCalled();
+      expect(patientPosts).toBe(arrayOfPatientPosts);
+      expect(patientsService.findAllPostsByPatient).toHaveBeenCalled();
     });
 
     it("should throw an exception when there's an error", () => {
-      jest.spyOn(patientsService, 'findAll').mockRejectedValueOnce(new Error());
+      jest
+        .spyOn(patientsService, 'findAllPostsByPatient')
+        .mockRejectedValueOnce(new Error());
 
-      expect(patientsController.findAll()).rejects.toThrowError();
+      expect(
+        patientsController.findAllPostsByPatient(testPatient.id),
+      ).rejects.toThrowError();
+    });
+  });
+
+  describe('updatePatient method (PATCH)', () => {
+    it('should update patient', async () => {
+      const updatedPatient: UpdatePatientDto = { name: 'another name' };
+      const patient = await patientsController.update(
+        testPatient.id,
+        updatedPatient,
+      );
+
+      expect(patient).toEqual({ id: testPatient.id, ...updatedPatient });
+      expect(patientsService.update).toHaveBeenCalled();
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest.spyOn(patientsService, 'update').mockRejectedValueOnce(new Error());
+
+      expect(
+        patientsController.update(testPatient.id, { name: 'another name' }),
+      ).rejects.toThrowError();
+    });
+  });
+
+  describe('deletePatient method (DELETE)', () => {
+    it('should delete patient', async () => {
+      const patient = await patientsController.remove(testPatient.id);
+
+      expect(patient).toEqual(testPatient);
+      expect(patientsService.remove).toHaveBeenCalled();
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest.spyOn(patientsService, 'remove').mockRejectedValueOnce(new Error());
+
+      expect(patientsController.remove(testPatient.id)).rejects.toThrowError();
     });
   });
 });
