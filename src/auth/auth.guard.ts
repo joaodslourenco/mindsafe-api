@@ -1,16 +1,21 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { Request } from 'express';
 import { IS_PUBLIC_KEY } from 'src/common/decorators/public';
 import { Reflector } from '@nestjs/core';
-import { UnauthorizedError } from 'src/common/errors/types/UnauthorizedError';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(private jwtService: JwtService, private reflector: Reflector) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    // return true;
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
@@ -22,7 +27,7 @@ export class AuthGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
-      throw new UnauthorizedError('No token found.');
+      throw new UnauthorizedException('No token found.');
     }
     try {
       const payload = await this.jwtService.verifyAsync(token, {
@@ -31,7 +36,7 @@ export class AuthGuard implements CanActivate {
 
       request['user'] = payload;
     } catch {
-      throw new UnauthorizedError(
+      throw new UnauthorizedException(
         'There was an error while verifying the token',
       );
     }
