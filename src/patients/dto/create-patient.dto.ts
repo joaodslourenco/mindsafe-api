@@ -1,4 +1,10 @@
-import { IsEmail, IsNotEmpty, IsString, MaxLength } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsString,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class CreatePatientDto {
   @IsEmail()
@@ -11,6 +17,7 @@ export class CreatePatientDto {
 
   @IsNotEmpty()
   @MaxLength(10)
+  @MinLength(5)
   @IsString()
   password: string;
 }
