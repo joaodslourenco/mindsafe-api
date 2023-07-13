@@ -10,13 +10,7 @@ export class PatientsService {
   constructor(private readonly patientsRepository: PatientsRepository) {}
 
   create(createPatientDto: CreatePatientDto) {
-    const plainTextPassword = createPatientDto.password;
-
-    const salt = genSaltSync(10);
-
-    const hashedPassword = hashSync(plainTextPassword, salt);
-
-    createPatientDto.password = hashedPassword;
+    createPatientDto.password = this.hashPassword(createPatientDto.password);
 
     return this.patientsRepository.create(createPatientDto);
   }
@@ -52,11 +46,26 @@ export class PatientsService {
     return this.patientsRepository.findAllPostsByPatient(id);
   }
 
-  update(id: string, updatePatientDto: UpdatePatientDto) {
+  async update(id: string, updatePatientDto: UpdatePatientDto) {
+    const patient = await this.patientsRepository.findOne(id);
+
+    if (!patient) {
+      throw new NotFoundError('Patient not found');
+    }
+
+    updatePatientDto.password = this.hashPassword(updatePatientDto.password);
+
     return this.patientsRepository.update(id, updatePatientDto);
   }
 
   remove(id: string) {
     return this.patientsRepository.remove(id);
+  }
+
+  private hashPassword(plainTextPassword: string) {
+    const salt = genSaltSync(10);
+    const hashedPassword = hashSync(plainTextPassword, salt);
+
+    return hashedPassword;
   }
 }
