@@ -53,7 +53,9 @@ export class PatientsService {
       throw new NotFoundError('Patient not found');
     }
 
-    updatePatientDto.password = this.hashPassword(updatePatientDto.password);
+    if (updatePatientDto.password) {
+      updatePatientDto.password = this.hashPassword(updatePatientDto.password);
+    }
 
     return this.patientsRepository.update(id, updatePatientDto);
   }
