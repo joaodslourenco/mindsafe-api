@@ -4,6 +4,7 @@ import { CreatePatientDto } from '../dto/create-patient.dto';
 import { UpdatePatientDto } from '../dto/update-patient.dto';
 import { NotFoundError } from 'src/common/errors/types/NotFoundError';
 import { ConflictError } from 'src/common/errors/types/ConflictError';
+import { PatientEntity } from '../entities/patient.entity';
 
 @Injectable()
 export class PatientsRepository {
@@ -55,7 +56,10 @@ export class PatientsRepository {
     return postsByPatient;
   }
 
-  update(id: string, updatePatientDto: UpdatePatientDto) {
+  update(
+    id: string,
+    updatePatientDto: UpdatePatientDto,
+  ): Promise<PatientEntity> {
     return this.prisma.patient.update({
       where: { id },
       data: updatePatientDto,
