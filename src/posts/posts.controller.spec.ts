@@ -23,8 +23,8 @@ describe('PostsController', () => {
           provide: PostsService,
           useValue: {
             create: jest.fn().mockResolvedValue(examplePost),
+            findOne: jest.fn().mockResolvedValue(examplePost),
             findAll: jest.fn(),
-            findOne: jest.fn(),
             update: jest.fn(),
             remove: jest.fn(),
           },
@@ -66,6 +66,21 @@ describe('PostsController', () => {
       jest.spyOn(postsService, 'create').mockRejectedValueOnce(new Error());
 
       expect(postsController.create(newPost)).rejects.toThrowError();
+    });
+  });
+
+  describe('findOne method (GET)', () => {
+    it('should get an patient', async () => {
+      const post = await postsController.findOne(examplePost.id);
+
+      expect(post).toBe(examplePost);
+      expect(postsService.findOne).toHaveBeenCalledWith(examplePost.id);
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest.spyOn(postsService, 'findOne').mockRejectedValueOnce(new Error());
+
+      expect(postsController.findOne(examplePost.id)).rejects.toThrowError();
     });
   });
 });
