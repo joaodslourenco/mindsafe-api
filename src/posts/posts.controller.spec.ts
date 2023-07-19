@@ -64,7 +64,7 @@ describe('PostsController', () => {
       expect(postsService.create).toHaveBeenCalled();
     });
 
-    it('should return the new patient obj with the same keys', async () => {
+    it('should return the new post obj with the same keys', async () => {
       const newUser = await postsController.create(newPost);
 
       expect(Object.keys(newUser)).toEqual(Object.keys(examplePost));
@@ -78,7 +78,7 @@ describe('PostsController', () => {
   });
 
   describe('findOne method (GET)', () => {
-    it('should get an patient', async () => {
+    it('should get a post', async () => {
       const post = await postsController.findOne(examplePost.id);
 
       expect(post).toBe(examplePost);
@@ -107,12 +107,12 @@ describe('PostsController', () => {
     });
   });
 
-  describe('updatePatient method (PATCH)', () => {
-    it('should update patient', async () => {
+  describe('updatePost method (PATCH)', () => {
+    it('should update post', async () => {
       const updatedPost: UpdatePostDto = { content: 'another content' };
-      const patient = await postsController.update(examplePost.id, updatedPost);
+      const post = await postsController.update(examplePost.id, updatedPost);
 
-      expect(patient).toEqual({ id: examplePost.id, ...updatedPost });
+      expect(post).toEqual({ id: examplePost.id, ...updatedPost });
       expect(postsService.update).toHaveBeenCalled();
     });
 
