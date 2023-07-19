@@ -11,6 +11,8 @@ const examplePost: PostEntity = {
   createdAt: new Date(),
 };
 
+const arrayOfPosts = [examplePost, examplePost, examplePost];
+
 describe('PostsController', () => {
   let postsController: PostsController;
   let postsService: PostsService;
@@ -24,7 +26,7 @@ describe('PostsController', () => {
           useValue: {
             create: jest.fn().mockResolvedValue(examplePost),
             findOne: jest.fn().mockResolvedValue(examplePost),
-            findAll: jest.fn(),
+            findAll: jest.fn().mockResolvedValue(arrayOfPosts),
             update: jest.fn(),
             remove: jest.fn(),
           },
@@ -81,6 +83,21 @@ describe('PostsController', () => {
       jest.spyOn(postsService, 'findOne').mockRejectedValueOnce(new Error());
 
       expect(postsController.findOne(examplePost.id)).rejects.toThrowError();
+    });
+  });
+
+  describe('findAll method (GET)', () => {
+    it('should get all posts', async () => {
+      const posts = await postsController.findAll();
+
+      expect(posts).toBe(arrayOfPosts);
+      expect(postsService.findAll).toHaveBeenCalled();
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest.spyOn(postsService, 'findAll').mockRejectedValueOnce(new Error());
+
+      expect(postsController.findAll()).rejects.toThrowError();
     });
   });
 });
