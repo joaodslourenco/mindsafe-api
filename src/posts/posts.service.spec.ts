@@ -34,7 +34,7 @@ describe('PostsService', () => {
                 id,
                 ...updateDto,
               })),
-            remove: jest.fn(),
+            remove: jest.fn().mockResolvedValue(examplePost),
           },
         },
       ],
@@ -122,6 +122,21 @@ describe('PostsService', () => {
       expect(
         postsService.update(examplePost.id, { content: 'another content' }),
       ).rejects.toThrowError();
+    });
+  });
+
+  describe('deletePost method (DELETE)', () => {
+    it('should delete post', async () => {
+      const post = await postsService.remove(examplePost.id);
+
+      expect(post).toEqual(examplePost);
+      expect(postsRepository.remove).toHaveBeenCalled();
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest.spyOn(postsRepository, 'remove').mockRejectedValueOnce(new Error());
+
+      expect(postsService.remove(examplePost.id)).rejects.toThrowError();
     });
   });
 });
