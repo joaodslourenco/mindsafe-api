@@ -107,22 +107,26 @@ describe('PostsService', () => {
       expect(postsRepository.findAll()).rejects.toThrowError();
     });
   });
+
+  describe('findOne method (GET)', () => {
+    it('should get a post', async () => {
+      const post = await postsRepository.findOne(examplePost.id);
+
+      expect(post).toBe(examplePost);
+      expect(prismaService.post.findUnique).toHaveBeenCalledWith({
+        where: { id: examplePost.id },
+      });
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest
+        .spyOn(prismaService.post, 'findUnique')
+        .mockRejectedValueOnce(new Error());
+
+      expect(postsRepository.findOne(examplePost.id)).rejects.toThrowError();
+    });
+  });
 });
-//   describe('findOne method (GET)', () => {
-//     it('should get a post', async () => {
-//       const post = await postsService.findOne(examplePost.id);
-
-//       expect(post).toBe(examplePost);
-//       expect(postsRepository.findOne).toHaveBeenCalledWith(examplePost.id);
-//     });
-
-//     it("should throw an exception when there's an error", () => {
-//       jest.spyOn(postsRepository, 'findOne').mockRejectedValueOnce(new Error());
-
-//       expect(postsService.findOne(examplePost.id)).rejects.toThrowError();
-//     });
-//   });
-
 //   describe('updatePost method (PATCH)', () => {
 //     it('should update post', async () => {
 //       const updatedPost: UpdatePostDto = { content: 'another content' };
