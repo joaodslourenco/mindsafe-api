@@ -90,22 +90,24 @@ describe('PostsService', () => {
       expect(postsRepository.create(newPost)).rejects.toThrowError();
     });
   });
+
+  describe('findAll method (GET)', () => {
+    it('should get all posts', async () => {
+      const posts = await postsRepository.findAll();
+
+      expect(posts).toBe(arrayOfPosts);
+      expect(prismaService.post.findMany).toHaveBeenCalled();
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest
+        .spyOn(prismaService.post, 'findMany')
+        .mockRejectedValueOnce(new Error());
+
+      expect(postsRepository.findAll()).rejects.toThrowError();
+    });
+  });
 });
-//   describe('findAll method (GET)', () => {
-//     it('should get all posts', async () => {
-//       const posts = await postsService.findAll();
-
-//       expect(posts).toBe(arrayOfPosts);
-//       expect(postsRepository.findAll).toHaveBeenCalled();
-//     });
-
-//     it("should throw an exception when there's an error", () => {
-//       jest.spyOn(postsRepository, 'findAll').mockRejectedValueOnce(new Error());
-
-//       expect(postsService.findAll()).rejects.toThrowError();
-//     });
-//   });
-
 //   describe('findOne method (GET)', () => {
 //     it('should get a post', async () => {
 //       const post = await postsService.findOne(examplePost.id);
