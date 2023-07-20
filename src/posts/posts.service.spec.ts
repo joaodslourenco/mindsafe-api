@@ -26,7 +26,7 @@ describe('PostsService', () => {
           useValue: {
             create: jest.fn().mockResolvedValue(examplePost),
             findAll: jest.fn().mockResolvedValue(arrayOfPosts),
-            findOne: jest.fn(),
+            findOne: jest.fn().mockResolvedValue(examplePost),
             update: jest.fn(),
             remove: jest.fn(),
           },
@@ -65,7 +65,7 @@ describe('PostsService', () => {
     });
 
     it("should throw an exception when there's an error", () => {
-      jest.spyOn(postsService, 'create').mockRejectedValueOnce(new Error());
+      jest.spyOn(postsRepository, 'create').mockRejectedValueOnce(new Error());
 
       expect(postsService.create(newPost)).rejects.toThrowError();
     });
@@ -80,9 +80,24 @@ describe('PostsService', () => {
     });
 
     it("should throw an exception when there's an error", () => {
-      jest.spyOn(postsService, 'findAll').mockRejectedValueOnce(new Error());
+      jest.spyOn(postsRepository, 'findAll').mockRejectedValueOnce(new Error());
 
       expect(postsService.findAll()).rejects.toThrowError();
+    });
+  });
+
+  describe('findOne method (GET)', () => {
+    it('should get a post', async () => {
+      const post = await postsService.findOne(examplePost.id);
+
+      expect(post).toBe(examplePost);
+      expect(postsRepository.findOne).toHaveBeenCalledWith(examplePost.id);
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest.spyOn(postsRepository, 'findOne').mockRejectedValueOnce(new Error());
+
+      expect(postsService.findOne(examplePost.id)).rejects.toThrowError();
     });
   });
 });
