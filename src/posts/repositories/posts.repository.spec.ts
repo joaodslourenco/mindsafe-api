@@ -126,37 +126,43 @@ describe('PostsService', () => {
       expect(postsRepository.findOne(examplePost.id)).rejects.toThrowError();
     });
   });
+
+  describe('updatePost method (PATCH)', () => {
+    it('should update post', async () => {
+      jest
+        .spyOn(prismaService.post, 'update')
+        .mockResolvedValueOnce({ ...examplePost, content: 'another content' });
+
+      const updatedPost: UpdatePostDto = { content: 'another content' };
+      const post = await postsRepository.update(examplePost.id, updatedPost);
+
+      expect(post).toEqual({ ...examplePost, ...updatedPost });
+      expect(prismaService.post.update).toHaveBeenCalled();
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest.spyOn(postsRepository, 'update').mockRejectedValueOnce(new Error());
+
+      expect(
+        postsRepository.update(examplePost.id, { content: 'another content' }),
+      ).rejects.toThrowError();
+    });
+  });
+
+  describe('deletePost method (DELETE)', () => {
+    it('should delete post', async () => {
+      const post = await postsRepository.remove(examplePost.id);
+
+      expect(post).toEqual(examplePost);
+      expect(prismaService.post.delete).toHaveBeenCalled();
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest
+        .spyOn(prismaService.post, 'delete')
+        .mockRejectedValueOnce(new Error());
+
+      expect(postsRepository.remove(examplePost.id)).rejects.toThrowError();
+    });
+  });
 });
-//   describe('updatePost method (PATCH)', () => {
-//     it('should update post', async () => {
-//       const updatedPost: UpdatePostDto = { content: 'another content' };
-//       const post = await postsService.update(examplePost.id, updatedPost);
-
-//       expect(post).toEqual({ id: examplePost.id, ...updatedPost });
-//       expect(postsRepository.update).toHaveBeenCalled();
-//     });
-
-//     it("should throw an exception when there's an error", () => {
-//       jest.spyOn(postsRepository, 'update').mockRejectedValueOnce(new Error());
-
-//       expect(
-//         postsService.update(examplePost.id, { content: 'another content' }),
-//       ).rejects.toThrowError();
-//     });
-//   });
-
-//   describe('deletePost method (DELETE)', () => {
-//     it('should delete post', async () => {
-//       const post = await postsService.remove(examplePost.id);
-
-//       expect(post).toEqual(examplePost);
-//       expect(postsRepository.remove).toHaveBeenCalled();
-//     });
-
-//     it("should throw an exception when there's an error", () => {
-//       jest.spyOn(postsRepository, 'remove').mockRejectedValueOnce(new Error());
-
-//       expect(postsService.remove(examplePost.id)).rejects.toThrowError();
-//     });
-//   });
-// });
