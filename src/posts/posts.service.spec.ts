@@ -3,6 +3,7 @@ import { PostsService } from './posts.service';
 import { PostsRepository } from './repositories/posts.repository';
 import { CreatePostDto } from './dto/create-post.dto';
 import { PostEntity } from './entities/post.entity';
+import { UpdatePostDto } from './dto/update-post.dto';
 
 const examplePost: PostEntity = {
   id: 'some-id',
@@ -27,7 +28,12 @@ describe('PostsService', () => {
             create: jest.fn().mockResolvedValue(examplePost),
             findAll: jest.fn().mockResolvedValue(arrayOfPosts),
             findOne: jest.fn().mockResolvedValue(examplePost),
-            update: jest.fn(),
+            update: jest
+              .fn()
+              .mockImplementation((id: string, updateDto: UpdatePostDto) => ({
+                id,
+                ...updateDto,
+              })),
             remove: jest.fn(),
           },
         },
@@ -98,6 +104,24 @@ describe('PostsService', () => {
       jest.spyOn(postsRepository, 'findOne').mockRejectedValueOnce(new Error());
 
       expect(postsService.findOne(examplePost.id)).rejects.toThrowError();
+    });
+  });
+
+  describe('updatePost method (PATCH)', () => {
+    it('should update post', async () => {
+      const updatedPost: UpdatePostDto = { content: 'another content' };
+      const post = await postsService.update(examplePost.id, updatedPost);
+
+      expect(post).toEqual({ id: examplePost.id, ...updatedPost });
+      expect(postsRepository.update).toHaveBeenCalled();
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest.spyOn(postsRepository, 'update').mockRejectedValueOnce(new Error());
+
+      expect(
+        postsService.update(examplePost.id, { content: 'another content' }),
+      ).rejects.toThrowError();
     });
   });
 });
