@@ -110,7 +110,9 @@ describe('PatientsService', () => {
     });
 
     it("should throw an exception when there's an error", () => {
-      jest.spyOn(patientsService, 'findAll').mockRejectedValueOnce(new Error());
+      jest
+        .spyOn(patientsRepository, 'findAll')
+        .mockRejectedValueOnce(new Error());
 
       expect(patientsService.findAll()).rejects.toThrowError();
     });
