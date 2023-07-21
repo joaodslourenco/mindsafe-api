@@ -79,4 +79,42 @@ describe('TherapistsService', () => {
       expect(therapistsService.create(testTherapist)).rejects.toThrowError();
     });
   });
+
+  describe('findOne method (GET)', () => {
+    it('should get an therapist', async () => {
+      const therapist = await therapistsService.findOne(testTherapist.id);
+
+      expect(therapist).toBe(testTherapist);
+      expect(therapistsRepository.findOne).toHaveBeenCalledWith(
+        testTherapist.id,
+      );
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest
+        .spyOn(therapistsRepository, 'findOne')
+        .mockRejectedValueOnce(new Error());
+
+      expect(
+        therapistsService.findOne(testTherapist.id),
+      ).rejects.toThrowError();
+    });
+  });
+
+  describe('findAll method (GET)', () => {
+    it('should get all therapists', async () => {
+      const therapists = await therapistsService.findAll();
+
+      expect(therapists).toBe(arrayOfTherapists);
+      expect(therapistsRepository.findAll).toHaveBeenCalled();
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest
+        .spyOn(therapistsRepository, 'findAll')
+        .mockRejectedValueOnce(new Error());
+
+      expect(therapistsService.findAll()).rejects.toThrowError();
+    });
+  });
 });
