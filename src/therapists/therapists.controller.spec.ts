@@ -138,4 +138,23 @@ describe('TherapistsController', () => {
       ).rejects.toThrowError();
     });
   });
+
+  describe('deleteTherapist method (DELETE)', () => {
+    it('should delete therapist', async () => {
+      const therapist = await therapistsController.remove(testTherapist.id);
+
+      expect(therapist).toEqual(testTherapist);
+      expect(therapistsService.remove).toHaveBeenCalled();
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest
+        .spyOn(therapistsService, 'remove')
+        .mockRejectedValueOnce(new Error());
+
+      expect(
+        therapistsController.remove(testTherapist.id),
+      ).rejects.toThrowError();
+    });
+  });
 });
