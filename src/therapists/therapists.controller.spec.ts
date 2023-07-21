@@ -3,7 +3,16 @@ import { TherapistsController } from './therapists.controller';
 import { TherapistsService } from './therapists.service';
 import { UpdatePatientDto } from 'src/patients/dto/update-patient.dto';
 
-const testTherapist = {};
+const testTherapist = {
+  id: '538b19e0-9be9-4d04-aa6f-80763784ae2a',
+  email: 'pedro@teste.com',
+  name: 'Pedro',
+  patientId: '59da21dc-0709-4d3e-bdaa-0e9774c1633f',
+  patient: {
+    name: 'João',
+    email: 'joao@teste.com',
+  },
+};
 
 const arrayOfTherapists = [testTherapist, testTherapist, testTherapist];
 
@@ -42,5 +51,32 @@ describe('TherapistsController', () => {
 
   it('should be defined', () => {
     expect(therapistsController).toBeDefined();
+  });
+
+  describe('create method (POST)', () => {
+    it('should return as defined', async () => {
+      const newUser = await therapistsController.create(testTherapist);
+
+      expect(newUser).toBeDefined();
+    });
+
+    it('should have called therapistsService Create', async () => {
+      therapistsController.create(testTherapist);
+      expect(therapistsService.create).toHaveBeenCalled();
+    });
+
+    it('should return the new patient obj with the same keys', async () => {
+      const newUser = await therapistsController.create(testTherapist);
+
+      expect(Object.keys(newUser)).toEqual(Object.keys(testTherapist));
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest
+        .spyOn(therapistsService, 'create')
+        .mockRejectedValueOnce(new Error());
+
+      expect(therapistsController.create(testTherapist)).rejects.toThrowError();
+    });
   });
 });
