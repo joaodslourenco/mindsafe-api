@@ -1,18 +1,82 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TherapistsService } from './therapists.service';
+import { TherapistsRepository } from './repositories/therapists.repository';
+import { UpdatePatientDto } from 'src/patients/dto/update-patient.dto';
+
+const testTherapist = {
+  id: '538b19e0-9be9-4d04-aa6f-80763784ae2a',
+  email: 'pedro@teste.com',
+  name: 'Pedro',
+  patientId: '59da21dc-0709-4d3e-bdaa-0e9774c1633f',
+  patient: {
+    name: 'João',
+    email: 'joao@teste.com',
+  },
+};
+
+const arrayOfTherapists = [testTherapist, testTherapist, testTherapist];
 
 describe('TherapistsService', () => {
-  let service: TherapistsService;
+  let therapistsService: TherapistsService;
+  let therapistsRepository: TherapistsRepository;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [TherapistsService],
+      providers: [
+        TherapistsService,
+        {
+          provide: TherapistsRepository,
+          useValue: {
+            create: jest.fn().mockResolvedValue(testTherapist),
+            findOne: jest.fn().mockResolvedValue(testTherapist),
+            findAll: jest.fn().mockResolvedValue(arrayOfTherapists),
+            update: jest
+              .fn()
+              .mockImplementation(
+                (id: string, updateDto: UpdatePatientDto) => ({
+                  id,
+                  ...updateDto,
+                }),
+              ),
+            remove: jest.fn().mockResolvedValue(testTherapist),
+          },
+        },
+      ],
     }).compile();
 
-    service = module.get<TherapistsService>(TherapistsService);
+    therapistsService = module.get<TherapistsService>(TherapistsService);
+    therapistsRepository =
+      module.get<TherapistsRepository>(TherapistsRepository);
   });
 
   it('should be defined', () => {
-    expect(service).toBeDefined();
+    expect(therapistsService).toBeDefined();
+  });
+
+  describe('create method (POST)', () => {
+    it('should return as defined', async () => {
+      const newUser = await therapistsService.create(testTherapist);
+
+      expect(newUser).toBeDefined();
+    });
+
+    it('should have called therapistsRepository Create', async () => {
+      await therapistsService.create(testTherapist);
+      expect(therapistsRepository.create).toHaveBeenCalled();
+    });
+
+    it('should return the new therapist obj with the same keys', async () => {
+      const newUser = await therapistsService.create(testTherapist);
+
+      expect(Object.keys(newUser)).toEqual(Object.keys(testTherapist));
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest
+        .spyOn(therapistsRepository, 'create')
+        .mockRejectedValueOnce(new Error());
+
+      expect(therapistsService.create(testTherapist)).rejects.toThrowError();
+    });
   });
 });
