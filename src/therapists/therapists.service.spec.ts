@@ -117,4 +117,27 @@ describe('TherapistsService', () => {
       expect(therapistsService.findAll()).rejects.toThrowError();
     });
   });
+
+  describe('updateTherapist method (PATCH)', () => {
+    it('should update patient', async () => {
+      const updatedTherapist: UpdatePatientDto = { name: 'another name' };
+      const therapist = await therapistsService.update(
+        testTherapist.id,
+        updatedTherapist,
+      );
+
+      expect(therapist).toEqual({ id: testTherapist.id, ...updatedTherapist });
+      expect(therapistsRepository.update).toHaveBeenCalled();
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest
+        .spyOn(therapistsRepository, 'update')
+        .mockRejectedValueOnce(new Error());
+
+      expect(
+        therapistsService.update(testTherapist.id, { name: 'another name' }),
+      ).rejects.toThrowError();
+    });
+  });
 });
