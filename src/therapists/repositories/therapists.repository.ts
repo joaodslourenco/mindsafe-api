@@ -23,7 +23,11 @@ export class TherapistsRepository {
   }
 
   findAll() {
-    return this.prisma.therapist.findMany({ include: { patient: true } });
+    return this.prisma.therapist.findMany({
+      include: {
+        patient: { select: { name: true, email: true } },
+      },
+    });
   }
 
   findOne(id: string) {
