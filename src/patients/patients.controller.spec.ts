@@ -68,7 +68,7 @@ describe('PatientsController', () => {
     });
 
     it('should have called patientsService Create', async () => {
-      patientsController.create(testPatient);
+      await patientsController.create(testPatient);
       expect(patientsService.create).toHaveBeenCalled();
     });
 
