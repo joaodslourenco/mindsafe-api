@@ -61,11 +61,11 @@ describe('TherapistsController', () => {
     });
 
     it('should have called therapistsService Create', async () => {
-      therapistsController.create(testTherapist);
+      await therapistsController.create(testTherapist);
       expect(therapistsService.create).toHaveBeenCalled();
     });
 
-    it('should return the new patient obj with the same keys', async () => {
+    it('should return the new therapist obj with the same keys', async () => {
       const newUser = await therapistsController.create(testTherapist);
 
       expect(Object.keys(newUser)).toEqual(Object.keys(testTherapist));
@@ -77,6 +77,25 @@ describe('TherapistsController', () => {
         .mockRejectedValueOnce(new Error());
 
       expect(therapistsController.create(testTherapist)).rejects.toThrowError();
+    });
+  });
+
+  describe('findOne method (GET)', () => {
+    it('should get an therapist', async () => {
+      const therapist = await therapistsController.findOne(testTherapist.id);
+
+      expect(therapist).toBe(testTherapist);
+      expect(therapistsService.findOne).toHaveBeenCalledWith(testTherapist.id);
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest
+        .spyOn(therapistsService, 'findOne')
+        .mockRejectedValueOnce(new Error());
+
+      expect(
+        therapistsController.findOne(testTherapist.id),
+      ).rejects.toThrowError();
     });
   });
 });
