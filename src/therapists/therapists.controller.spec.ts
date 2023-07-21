@@ -98,4 +98,21 @@ describe('TherapistsController', () => {
       ).rejects.toThrowError();
     });
   });
+
+  describe('findAll method (GET)', () => {
+    it('should get all therapists', async () => {
+      const therapists = await therapistsController.findAll();
+
+      expect(therapists).toBe(arrayOfTherapists);
+      expect(therapistsService.findAll).toHaveBeenCalled();
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest
+        .spyOn(therapistsService, 'findAll')
+        .mockRejectedValueOnce(new Error());
+
+      expect(therapistsController.findAll()).rejects.toThrowError();
+    });
+  });
 });
