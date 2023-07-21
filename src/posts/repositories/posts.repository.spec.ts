@@ -23,7 +23,7 @@ const examplePost: PostEntity = {
 
 const arrayOfPosts = [examplePost, examplePost, examplePost];
 
-describe('PostsService', () => {
+describe('PostsRepository', () => {
   let postsRepository: PostsRepository;
   let prismaService: PrismaService;
 
