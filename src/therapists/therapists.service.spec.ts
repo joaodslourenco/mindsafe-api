@@ -119,7 +119,7 @@ describe('TherapistsService', () => {
   });
 
   describe('updateTherapist method (PATCH)', () => {
-    it('should update patient', async () => {
+    it('should update therapist', async () => {
       const updatedTherapist: UpdatePatientDto = { name: 'another name' };
       const therapist = await therapistsService.update(
         testTherapist.id,
@@ -138,6 +138,23 @@ describe('TherapistsService', () => {
       expect(
         therapistsService.update(testTherapist.id, { name: 'another name' }),
       ).rejects.toThrowError();
+    });
+  });
+
+  describe('deleteTherapist method (DELETE)', () => {
+    it('should delete therapist', async () => {
+      const therapist = await therapistsService.remove(testTherapist.id);
+
+      expect(therapist).toEqual(testTherapist);
+      expect(therapistsRepository.remove).toHaveBeenCalled();
+    });
+
+    it("should throw an exception when there's an error", () => {
+      jest
+        .spyOn(therapistsRepository, 'remove')
+        .mockRejectedValueOnce(new Error());
+
+      expect(therapistsService.remove(testTherapist.id)).rejects.toThrowError();
     });
   });
 });
