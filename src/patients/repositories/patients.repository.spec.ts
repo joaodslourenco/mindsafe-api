@@ -27,7 +27,7 @@ const patientPost = {
 };
 const arrayOfPatientPosts = [patientPost, patientPost, patientPost];
 
-describe('PatientsController', () => {
+describe('PatientsRepository', () => {
   let patientsRepository: PatientsRepository;
   let prismaService: PrismaService;
 
