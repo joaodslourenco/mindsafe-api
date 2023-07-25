@@ -107,7 +107,6 @@ describe('TherapistsRepository', () => {
       expect(therapist).toBe(testTherapist);
       expect(prismaService.therapist.findUnique).toHaveBeenCalledWith({
         where: { id: testTherapist.id },
-        include: { posts: true, therapists: true },
       });
     });
 
@@ -139,14 +138,6 @@ describe('TherapistsRepository', () => {
     });
   });
 
-  it("should throw an exception when there's an error", () => {
-    jest
-      .spyOn(prismaService.therapist, 'findUnique')
-      .mockRejectedValueOnce(new Error());
-
-    expect(therapistsRepository.findAll()).rejects.toThrowError();
-  });
-
   describe('updateTherapist method (PATCH)', () => {
     it('should update therapist', async () => {
       jest
@@ -176,28 +167,16 @@ describe('TherapistsRepository', () => {
   });
 
   describe('deleteTherapist method (DELETE)', () => {
-    it("should delete therapist's posts", async () => {
-      await therapistsRepository.remove(testTherapist.id);
-      expect(prismaService.post.deleteMany).toHaveBeenCalled();
-    });
-
-    it("should delete therapist's therapists", async () => {
-      await therapistsRepository.remove(testTherapist.id);
-      expect(prismaService.therapist.deleteMany).toHaveBeenCalled();
-    });
-
     it('should delete therapist', async () => {
       const therapist = await therapistsRepository.remove(testTherapist.id);
 
       expect(therapist).toEqual(testTherapist);
       expect(prismaService.therapist.delete).toHaveBeenCalled();
-      expect(prismaService.post.deleteMany).toHaveBeenCalled();
-      expect(prismaService.therapist.deleteMany).toHaveBeenCalled();
     });
 
     it("should throw an exception when there's an error", () => {
       jest
-        .spyOn(prismaService, '$transaction')
+        .spyOn(prismaService.therapist, 'delete')
         .mockRejectedValueOnce(new Error());
 
       expect(
